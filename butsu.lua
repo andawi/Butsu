@@ -6,6 +6,22 @@ Butsu:SetScript("OnEvent", function(self, event, ...)
 	self[event](self, event, ...)
 end)
 
+local OnEnter = function(self)
+	local slot = self:GetID()
+	if(GetLootSlotType(slot) == LOOT_SLOT_ITEM) then
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:SetLootItem(slot)
+		CursorUpdate(self)
+	end
+	self.Highlight:Show()
+end
+
+local OnLeave = function(self)
+	GameTooltip:Hide()
+	ResetCursor()
+	self.Highlight:Hide()
+end
+
 function Butsu:LOOT_OPENED(event, autoloot)
 	self:Show()
 
@@ -44,8 +60,7 @@ function Butsu:LOOT_OPENED(event, autoloot)
 				local color = ITEM_QUALITY_COLORS[quality]
 				local r, g, b = color.r, color.g, color.b
 
-				local slotType = GetLootSlotType(i)
-				if(slotType == LOOT_SLOT_MONEY) then
+				if(GetLootSlotType(i) == LOOT_SLOT_MONEY) then
 					item = item:gsub("\n", ", ")
 				end
 
@@ -62,24 +77,31 @@ function Butsu:LOOT_OPENED(event, autoloot)
 					slot.quest:Hide()
 				end
 
-				if(quality > 1 or questId or isQuestItem) then
-					if(questId or isQuestItem) then
-						r, g, b = 1, 1, .2
-					end
-
-					slot.drop:SetVertexColor(r, g, b)
-					slot.drop:Show()
-				else
-					slot.drop:Hide()
-				end
-
-				slot.isQuestItem = isQuestItem
 				slot.quality = quality
-
 				slot.name:SetText(item)
-				slot.name:SetTextColor(r, g, b)
+				slot.name:SetTextColor(r, g, b, 8)
 				slot.icon:SetTexture(texture)
-
+				
+				local db = _NS.db
+				local hl = slot:CreateTexture(nil, 'OVERLAY')
+				hl:SetPoint('RIGHT', slot.iconFrame, 'LEFT', 0, 0)
+				hl:SetPoint("LEFT", slot,-1,0)
+				hl:SetHeight(db.iconSize+2)
+				hl:SetTexture([=[Interface\Buttons\WHITE8x8]=])
+				hl:SetVertexColor(r, g, b,.1)
+				hl:SetBlendMode('ADD')
+				hl:Hide()
+				slot.Highlight = hl
+				
+				slot:SetScript('OnEnter', OnEnter)
+				slot:SetScript('OnLeave', OnLeave)
+				
+				if slot.quality>1 then 
+					slot.iconFrame:SetBackdropColor(r, g, b)
+				else
+					slot.iconFrame:SetBackdropColor(0, 0, 0)
+				end
+				
 				m = math.max(m, quality)
 
 				slot:Enable()
@@ -93,9 +115,9 @@ function Butsu:LOOT_OPENED(event, autoloot)
 		slot.name:SetText(L.empty)
 		slot.name:SetTextColor(color.r, color.g, color.b)
 		slot.icon:SetTexture[[Interface\Icons\INV_Misc_Herb_AncientLichen]]
+		slot.iconFrame:SetBackdropColor(0, 0, 0)
 
 		slot.count:Hide()
-		slot.drop:Hide()
 		slot:Disable()
 		slot:Show()
 	end

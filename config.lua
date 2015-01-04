@@ -12,7 +12,7 @@ do
 		_NS.db = setmetatable(db,
 		{
 			__index = {
-				iconSize = 22;
+				iconSize = 30;
 
 				-- Attempt to set sane defaults.
 				fontSizeTitle = math.floor(select(2, GameTooltipHeaderText:GetFont()) + .5);
@@ -28,7 +28,7 @@ do
 			ButsuDB = db
 		end
 
-		self.title:SetFont(GameTooltipHeaderText:GetFont(), _NS.db.fontSizeTitle, 'OUTLINE')
+		self.title:SetFont("Interface\\AddOns\\Media\\pixel.ttf", 8, "Outlinemonochrome")
 		self:SetScale(_NS.db.frameScale)
 
 		self:LoadPosition()
@@ -169,10 +169,6 @@ do
 			for _, slot in next, _NS.slots do
 				slot:SetHeight(value)
 				slot.iconFrame:SetSize(value, value)
-
-				slot.quest:SetSize(value * .8, value * .8)
-				slot.quest:ClearAllPoints()
-				slot.quest:SetPoint('BOTTOMLEFT', -value * .15, 0)
 			end
 
 			Butsu:UpdateWidth()

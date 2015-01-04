@@ -3,7 +3,7 @@ local Butsu = _G[_NAME]
 
 do
 	local title = Butsu:CreateFontString(nil, "OVERLAY")
-	title:SetPoint("BOTTOMLEFT", Butsu, "TOPLEFT", 5, 0)
+	title:SetPoint("BOTTOMLEFT", Butsu, "TOPLEFT", 0, 2)
 	Butsu.title = title
 end
 
@@ -23,16 +23,26 @@ Butsu:SetScript("OnHide", function(self)
 	CloseLoot()
 end)
 
+local createBackdrop = function(parent, anchor) 
+    local frame = CreateFrame("Frame", nil, parent)
+    frame:SetFrameStrata("LOW")
+    frame:SetPoint("TOPLEFT", anchor, "TOPLEFT", -4, 4)
+    frame:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", 4, -4)
+    frame:SetBackdrop({
+    edgeFile = [=[Interface\AddOns\Media\glowTex]=], edgeSize = 3,
+    bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=],
+    insets = {left = 3, right = 3, top = 3, bottom = 3}})
+    frame:SetBackdropColor(.05, .05, .05, .8)
+    frame:SetBackdropBorderColor(0, 0, 0)
+    return frame
+end
+
 Butsu:SetMovable(true)
 Butsu:RegisterForClicks"anyup"
 
 Butsu:SetParent(UIParent)
-Butsu:SetBackdrop{
-	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 16,
-	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 16,
-	insets = {left = 4, right = 4, top = 4, bottom = 4},
-}
-Butsu:SetBackdropColor(0, 0, 0, 1)
+
+Butsu.Backdrop = createBackdrop(Butsu, Butsu)
 
 Butsu:SetClampedToScreen(true)
 Butsu:SetClampRectInsets(0, 0, 14, 0)
